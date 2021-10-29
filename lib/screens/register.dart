@@ -1,9 +1,11 @@
+import 'package:covid_app/models/register_model.dart';
 import 'package:covid_app/screens/verification.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:provider/provider.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({Key? key}) : super(key: key);
@@ -27,6 +29,19 @@ class _RegisterFormState extends State<RegisterForm> {
     return null;
   }
 
+  void setGlobalState(
+    String curp,
+    String nombres,
+    String apellidoPaterno,
+    String apellidoMaterno,
+  ) {
+    var registerModel = context.read<RegisterModel>();
+    registerModel.curp = curp;
+    registerModel.nombres = nombres;
+    registerModel.apellidoPaterno = apellidoPaterno;
+    registerModel.apellidoMaterno = apellidoMaterno;
+  }
+
   Future<bool> checkExistence() async {
     CollectionReference users =
         FirebaseFirestore.instance.collection('vaccine_registers');
@@ -34,10 +49,16 @@ class _RegisterFormState extends State<RegisterForm> {
     try {
       DocumentSnapshot user = await users.doc(curp).get();
       if (user.data() != null) {
+        Map<String, dynamic> data = user.data() as Map<String, dynamic>;
+        setGlobalState(
+          curp,
+          data['nombres'],
+          data['apellido_paterno'],
+          data['apellido_materno'],
+        );
         return true;
-      } else {
-        return false;
       }
+      return false;
     } on Exception catch (_) {
       return false;
     }

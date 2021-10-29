@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:covid_app/models/register_model.dart';
 import 'package:covid_app/screens/certificate.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -50,7 +52,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Text(
-                  'Hola, Felipe Carrillo',
+                  'Hola, ${Provider.of<RegisterModel>(context, listen: false).nombres}',
                   style: Theme.of(context)
                       .textTheme
                       .headline6!
