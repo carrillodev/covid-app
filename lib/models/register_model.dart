@@ -6,4 +6,7 @@ class RegisterModel extends ChangeNotifier {
   late String apellidoPaterno;
   late String apellidoMaterno;
   late String folioMiVacuna;
+
+  String get nombreCompleto =>
+      nombres + ' ' + apellidoPaterno + ' ' + apellidoMaterno;
 }
