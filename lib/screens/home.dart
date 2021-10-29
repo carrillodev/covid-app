@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:covid_app/certificate.dart';
+import 'package:covid_app/screens/certificate.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';

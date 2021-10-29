@@ -1,4 +1,4 @@
-import 'package:covid_app/register.dart';
+import 'package:covid_app/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -147,7 +147,7 @@ class Slide extends StatelessWidget {
                 .copyWith(color: Colors.grey[800]),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 30.0),
+          const SizedBox(height: 15.0),
           Text(
             description,
             style: Theme.of(context)

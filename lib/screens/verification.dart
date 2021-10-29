@@ -1,5 +1,5 @@
-import 'package:covid_app/certificate.dart';
-import 'package:covid_app/home.dart';
+import 'package:covid_app/screens/certificate.dart';
+import 'package:covid_app/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
