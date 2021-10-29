@@ -1,6 +1,11 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:covid_app/models/register_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:uuid/uuid.dart';
@@ -13,21 +18,51 @@ class CertificateScreen extends StatefulWidget {
 }
 
 class _CertificateScreenState extends State<CertificateScreen> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   String digitalSign = const Uuid().v4();
   late List<Vaccine> vaccines = [];
   int _currentIndex = 0;
 
+  Future<void> getVaccinesData() async {
+    String curp = Provider.of<RegisterModel>(context, listen: false).curp;
+    CollectionReference appliedVaccines =
+        firestore.collection('applied_vaccines');
+    try {
+      DocumentSnapshot vaccinesData = await appliedVaccines.doc(curp).get();
+      Map<String, dynamic> data = vaccinesData.data() as Map<String, dynamic>;
+      digitalSign = data['sello_digital'];
+      Map<String, dynamic> dosis = data['dosis'];
+      dosis.forEach((key, value) {
+        Vaccine vaccine = Vaccine(
+          int.parse(key),
+          '2021-04-12',
+          value['marca_vacuna'],
+          value['lote_vacuna'],
+          digitalSign,
+        );
+        setState(() {
+          vaccines.add(vaccine);
+        });
+      });
+      log('Successful');
+    } on Exception catch (_) {
+      log('Error!');
+    }
+  }
+
+  void loadData() async {
+    await getVaccinesData();
+  }
+
   @override
   void initState() {
-    vaccines = [
-      Vaccine(1, '2021-04-12', 'Pfizer', 'EW4109', digitalSign),
-      Vaccine(2, '2021-05-12', 'Pfizer', 'EW4109', digitalSign),
-    ];
+    loadData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var register = context.watch<RegisterModel>();
     return Scaffold(
       backgroundColor: Colors.green[400],
       body: SafeArea(
@@ -66,7 +101,7 @@ class _CertificateScreenState extends State<CertificateScreen> {
                 Column(
                   children: [
                     Text(
-                      'Luis Felipe Carrillo Alvarado',
+                      register.nombreCompleto,
                       style: Theme.of(context).textTheme.bodyText1!.copyWith(
                             color: Colors.grey[600],
                             fontSize: 16.0,
@@ -75,7 +110,7 @@ class _CertificateScreenState extends State<CertificateScreen> {
                     ),
                     const SizedBox(height: 5.0),
                     Text(
-                      'CAAL991009HDGRLS09',
+                      register.curp,
                       style: Theme.of(context).textTheme.bodyText1!.copyWith(
                             color: Colors.grey[600],
                             fontSize: 16.0,
