@@ -16,30 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final String curp = 'CAAL991009HDGRLS09';
   final String url = 'https://coronavirus.gob.mx/contacto/';
-
-  Future<void> getVaccinesData() async {
-    CollectionReference appliedVaccines =
-        firestore.collection('applied_vaccines');
-    try {
-      DocumentSnapshot vaccines = await appliedVaccines.doc(curp).get();
-      Map<String, dynamic> data = vaccines.data() as Map<String, dynamic>;
-      log('Successful');
-    } on Exception catch (_) {
-      log('Error!');
-    }
-  }
-
-  void loadData() async {
-    await getVaccinesData();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadData();
-  }
 
   @override
   Widget build(BuildContext context) {
