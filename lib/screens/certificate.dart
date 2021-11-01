@@ -8,7 +8,6 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:uuid/uuid.dart';
 
 class CertificateScreen extends StatefulWidget {
   const CertificateScreen({Key? key}) : super(key: key);
@@ -19,9 +18,10 @@ class CertificateScreen extends StatefulWidget {
 
 class _CertificateScreenState extends State<CertificateScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String digitalSign = const Uuid().v4();
-  late List<Vaccine> vaccines = [];
+  String digitalSign = '';
   int _currentIndex = 0;
+  List<Vaccine> vaccines = [];
+  bool completeVaccination = false;
 
   Future<void> getVaccinesData() async {
     String curp = Provider.of<RegisterModel>(context, listen: false).curp;
@@ -32,18 +32,21 @@ class _CertificateScreenState extends State<CertificateScreen> {
       Map<String, dynamic> data = vaccinesData.data() as Map<String, dynamic>;
       digitalSign = data['sello_digital'];
       Map<String, dynamic> dosis = data['dosis'];
-      dosis.forEach((key, value) {
-        Vaccine vaccine = Vaccine(
-          int.parse(key),
-          '2021-04-12',
-          value['marca_vacuna'],
-          value['lote_vacuna'],
-          digitalSign,
-        );
-        setState(() {
-          vaccines.add(vaccine);
+      if (dosis.isNotEmpty) {
+        if (dosis.length == 2) completeVaccination = true;
+        dosis.forEach((key, value) {
+          Vaccine vaccine = Vaccine(
+            int.parse(key),
+            '2021-04-12',
+            value['marca_vacuna'],
+            value['lote_vacuna'],
+            digitalSign,
+          );
+          setState(() {
+            vaccines.add(vaccine);
+          });
         });
-      });
+      }
       log('Successful');
     } on Exception catch (_) {
       log('Error!');
@@ -64,7 +67,8 @@ class _CertificateScreenState extends State<CertificateScreen> {
   Widget build(BuildContext context) {
     var register = context.watch<RegisterModel>();
     return Scaffold(
-      backgroundColor: Colors.green[400],
+      backgroundColor:
+          completeVaccination ? Colors.green[400] : Colors.yellow[500],
       body: SafeArea(
         child: Center(
           child: Container(
@@ -86,12 +90,14 @@ class _CertificateScreenState extends State<CertificateScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                const Image(
-                  image: AssetImage('images/shield.png'),
+                Image(
+                  image: AssetImage(completeVaccination
+                      ? 'images/shield.png'
+                      : 'images/clock.png'),
                   width: 100,
                 ),
                 Text(
-                  'Vacuna completa',
+                  completeVaccination ? 'Vacuna completa' : 'Vacuna incompleta',
                   style: Theme.of(context)
                       .textTheme
                       .headline6!
