@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:intl/intl.dart';
 
 class CertificateScreen extends StatefulWidget {
   const CertificateScreen({Key? key}) : super(key: key);
@@ -35,9 +36,11 @@ class _CertificateScreenState extends State<CertificateScreen> {
       if (dosis.isNotEmpty) {
         if (dosis.length == 2) completeVaccination = true;
         dosis.forEach((key, value) {
+          Timestamp timestamp = value['fecha_aplicacion'];
+          DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
           Vaccine vaccine = Vaccine(
             int.parse(key),
-            '2021-04-12',
+            dateFormatter.format(timestamp.toDate()),
             value['marca_vacuna'],
             value['lote_vacuna'],
             digitalSign,
