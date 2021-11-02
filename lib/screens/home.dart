@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,24 +19,32 @@ class _HomePageState extends State<HomePage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final String url = 'https://coronavirus.gob.mx/contacto/';
 
+  final CameraPosition _initialPosition = const CameraPosition(
+    target: LatLng(25.563036, -103.500181),
+    zoom: 13.4746,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Hola, ${Provider.of<RegisterModel>(context, listen: false).nombres}',
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Show Snackbar',
+            onPressed: () {},
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Text(
-                  'Hola, ${Provider.of<RegisterModel>(context, listen: false).nombres}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6!
-                      .copyWith(color: Colors.grey[800]),
-                ),
-              ),
               Container(
                 width: double.infinity,
                 height: 160.0,
@@ -101,6 +110,68 @@ class _HomePageState extends State<HomePage> {
                           width: 120,
                         ),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: Text(
+                  'Centros de vacunación',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6!
+                      .copyWith(color: Colors.grey[800], fontSize: 16.0),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Container(
+                        width: 200.0,
+                        height: 180.0,
+                        margin: const EdgeInsets.only(right: 15.0),
+                        child: GoogleMap(
+                          zoomControlsEnabled: false,
+                          myLocationEnabled: false,
+                          rotateGesturesEnabled: false,
+                          scrollGesturesEnabled: false,
+                          tiltGesturesEnabled: false,
+                          initialCameraPosition: _initialPosition,
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hay 2 centros de vacunación cerca.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(
+                                    color: Colors.grey[800], fontSize: 16.0),
+                          ),
+                          const SizedBox(height: 5.0),
+                          Text(
+                            'Selecciona el lugar que prefieras y agenda tu cita.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(
+                                    color: Colors.grey[800], fontSize: 14.0),
+                          ),
+                          const SizedBox(height: 5.0),
+                          ElevatedButton(
+                            onPressed: () {},
+                            child: const Text('Agendar'),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

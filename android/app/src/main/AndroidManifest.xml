@@ -37,6 +37,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyCl8TiZieJ3fCWvrmz4MMrNB5NQh5uQFHs"/>
     </application>
     <queries>
     <!-- If your app opens https URLs -->
