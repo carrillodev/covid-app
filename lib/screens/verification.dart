@@ -84,12 +84,16 @@ class _VerificationPageState extends State<VerificationPage> {
               eachFieldWidth: 45.0,
               textStyle: const TextStyle(fontSize: 16.0, color: Colors.black),
               onSubmit: (String value) async {
-                PhoneAuthCredential phoneAuthCredential =
-                    PhoneAuthProvider.credential(
-                  verificationId: widget.verificationId,
-                  smsCode: value,
+                // PhoneAuthCredential phoneAuthCredential =
+                //     PhoneAuthProvider.credential(
+                //   verificationId: widget.verificationId,
+                //   smsCode: value,
+                // );
+                // signInWithPhoneAuthCredential(phoneAuthCredential);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
                 );
-                signInWithPhoneAuthCredential(phoneAuthCredential);
               },
               focusNode: _pinPutFocusNode,
               controller: _pinPutController,

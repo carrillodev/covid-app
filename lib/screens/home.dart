@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:covid_app/models/register_model.dart';
 import 'package:covid_app/screens/certificate.dart';
+import 'package:covid_app/screens/locations.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +21,24 @@ class _HomePageState extends State<HomePage> {
   final String url = 'https://coronavirus.gob.mx/contacto/';
 
   final CameraPosition _initialPosition = const CameraPosition(
-    target: LatLng(25.563036, -103.500181),
-    zoom: 13.4746,
+    target: LatLng(25.5446328, -103.5174302),
+    zoom: 12.4746,
+  );
+
+  Marker markerUjed = Marker(
+    markerId: const MarkerId('ujed'),
+    infoWindow: const InfoWindow(title: 'UJED'),
+    position: const LatLng(25.5584436, -103.5108516),
+    consumeTapEvents: true,
+    onTap: () {},
+  );
+
+  Marker markerHospitalLerdo = Marker(
+    markerId: const MarkerId('hospitalLerdo'),
+    infoWindow: const InfoWindow(title: 'Hospital Gral. Lerdo'),
+    position: const LatLng(25.5328062, -103.5305184),
+    consumeTapEvents: true,
+    onTap: () {},
   );
 
   @override
@@ -136,11 +153,13 @@ class _HomePageState extends State<HomePage> {
                         margin: const EdgeInsets.only(right: 15.0),
                         child: GoogleMap(
                           zoomControlsEnabled: false,
+                          zoomGesturesEnabled: false,
                           myLocationEnabled: false,
                           rotateGesturesEnabled: false,
                           scrollGesturesEnabled: false,
                           tiltGesturesEnabled: false,
                           initialCameraPosition: _initialPosition,
+                          markers: {markerUjed, markerHospitalLerdo},
                         ),
                       ),
                     ),
@@ -167,8 +186,15 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(height: 5.0),
                           ElevatedButton(
-                            onPressed: () {},
-                            child: const Text('Agendar'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LocationsPage(),
+                                ),
+                              );
+                            },
+                            child: const Text('Ver centros'),
                           ),
                         ],
                       ),
