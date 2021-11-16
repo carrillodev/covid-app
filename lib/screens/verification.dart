@@ -1,4 +1,5 @@
 import 'package:covid_app/screens/certificate.dart';
+import 'package:covid_app/screens/complete_profile.dart';
 import 'package:covid_app/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
@@ -92,7 +93,8 @@ class _VerificationPageState extends State<VerificationPage> {
                 // signInWithPhoneAuthCredential(phoneAuthCredential);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  MaterialPageRoute(
+                      builder: (context) => const CompleteProfilePage()),
                 );
               },
               focusNode: _pinPutFocusNode,
