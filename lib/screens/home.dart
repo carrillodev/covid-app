@@ -5,6 +5,7 @@ import 'package:covid_app/screens/certificate.dart';
 import 'package:covid_app/screens/locations.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -46,13 +47,27 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(
-          'Hola, ${Provider.of<RegisterModel>(context, listen: false).nombres}',
+        foregroundColor: Colors.grey[800],
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            const Text(
+              'Hola, ',
+              style: TextStyle(fontWeight: FontWeight.w400),
+            ),
+            Text(
+              Provider.of<RegisterModel>(context, listen: false).nombres,
+            )
+          ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Show Snackbar',
+            icon: CircleAvatar(
+              backgroundColor: Colors.grey[200],
+              child: Provider.of<RegisterModel>(context, listen: false)
+                  .imageProfile,
+            ),
+            tooltip: 'Configuración',
             onPressed: () {},
           ),
         ],
