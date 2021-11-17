@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:covid_app/models/register_model.dart';
 import 'package:covid_app/screens/certificate.dart';
 import 'package:covid_app/screens/locations.dart';
+import 'package:covid_app/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -44,6 +46,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    dynamic profileImage =
+        Provider.of<RegisterModel>(context, listen: false).imageProfile;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -61,14 +66,23 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: Provider.of<RegisterModel>(context, listen: false)
-                  .imageProfile,
+          CircleAvatar(
+            backgroundColor: Colors.grey[200],
+            child: IconButton(
+              iconSize: 24.0,
+              icon: profileImage ??
+                  Icon(
+                    Icons.person_outlined,
+                    color: Colors.grey[700],
+                  ),
+              tooltip: 'Configuración',
+              onPressed: () {
+                showCupertinoModalBottomSheet(
+                  context: context,
+                  builder: (context) => const SettingsPage(),
+                );
+              },
             ),
-            tooltip: 'Configuración',
-            onPressed: () {},
           ),
         ],
       ),

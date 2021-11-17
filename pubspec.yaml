@@ -50,6 +50,7 @@ dependencies:
   flutter_svg: ^0.23.0+1
   image_picker: ^0.8.4+4
   settings_ui: ^1.0.0
+  modal_bottom_sheet: ^2.0.0
 
 dev_dependencies:
   flutter_test:

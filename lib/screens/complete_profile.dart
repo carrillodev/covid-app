@@ -45,7 +45,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 
   Widget? selectedProfileImage;
-  Color? imageProfileBackground;
 
   @override
   void initState() {
@@ -55,7 +54,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       avatarList.add(avatarProfileImage(url));
     }
     selectedProfileImage = avatarList[0];
-    imageProfileBackground = Colors.grey[200];
     super.initState();
   }
 
@@ -71,12 +69,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             textStyle: const TextStyle(fontSize: 16.0),
           ),
           onPressed: () {
-            var registerModel = context.read<RegisterModel>();
-            selectedProfileImage = Icon(
-              Icons.person_outlined,
-              color: Colors.grey[700],
-            );
-            registerModel.imageProfile = selectedProfileImage;
+            context.read<RegisterModel>().imageProfile = null;
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
@@ -91,14 +84,12 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               textStyle: const TextStyle(fontSize: 16.0),
             ),
             onPressed: () {
-              var registerModel = context.read<RegisterModel>();
               if (imgType == 'icon') {
-                selectedProfileImage = Icon(
-                  Icons.person_outlined,
-                  color: Colors.grey[700],
-                );
+                context.read<RegisterModel>().imageProfile = null;
+              } else {
+                context.read<RegisterModel>().imageProfile =
+                    selectedProfileImage;
               }
-              registerModel.imageProfile = selectedProfileImage;
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
@@ -119,7 +110,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                   .headline6!
                   .copyWith(color: Colors.grey[800], fontSize: 18.0),
             ),
-            const SizedBox(height: 30.0),
+            const SizedBox(height: 20.0),
             Text(
               'Selecciona una imagen de perfil o toma una foto (esto es opcional y no afectará tu certificado).',
               style: Theme.of(context).textTheme.bodyText1!.copyWith(
@@ -133,11 +124,10 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             Container(
               padding: const EdgeInsets.all(15.0),
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(20.0),
-                ),
-                color: imageProfileBackground,
-              ),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                  color: Colors.grey[200]),
               child: selectedProfileImage,
             ),
             const SizedBox(height: 20.0),
@@ -171,20 +161,14 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.all(0),
                           side: const BorderSide(style: BorderStyle.none),
-                          backgroundColor:
-                              index == 0 ? Colors.grey[300] : Colors.blue[200],
+                          backgroundColor: Colors.grey[300],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           )),
                       onPressed: () {
                         setState(() {
                           selectedProfileImage = avatarList[index];
-                          if (index == 0) {
-                            imageProfileBackground = Colors.grey[200];
-                            imgType = 'icon';
-                          }
-                          imageProfileBackground = Colors.blue[200];
-                          imgType = 'svg';
+                          imgType = index == 0 ? 'icon' : 'svg';
                         });
                       },
                       child: OverflowBox(child: avatarList[index]),
@@ -199,7 +183,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                     await _picker.pickImage(source: ImageSource.camera);
                 setState(() {
                   selectedProfileImage = fileProfileImage(photo!.path);
-                  imageProfileBackground = Colors.grey[200];
                 });
               },
               child: Row(
@@ -223,7 +206,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                     await _picker.pickImage(source: ImageSource.gallery);
                 setState(() {
                   selectedProfileImage = fileProfileImage(image!.path);
-                  imageProfileBackground = Colors.grey[200];
                 });
               },
               child: Row(
