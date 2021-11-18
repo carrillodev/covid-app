@@ -29,17 +29,14 @@ class _RegisterFormState extends State<RegisterForm> {
     return null;
   }
 
-  void setGlobalState(
-    String curp,
-    String nombres,
-    String apellidoPaterno,
-    String apellidoMaterno,
-  ) {
+  void setGlobalState(String curp, String nombres, String apellidoPaterno,
+      String apellidoMaterno, String folioMiVacuna) {
     var registerModel = context.read<RegisterModel>();
     registerModel.curp = curp;
     registerModel.nombres = nombres;
     registerModel.apellidoPaterno = apellidoPaterno;
     registerModel.apellidoMaterno = apellidoMaterno;
+    registerModel.folioMiVacuna = folioMiVacuna;
   }
 
   Future<bool> checkExistence() async {
@@ -50,12 +47,8 @@ class _RegisterFormState extends State<RegisterForm> {
       DocumentSnapshot user = await users.doc(curp).get();
       if (user.data() != null) {
         Map<String, dynamic> data = user.data() as Map<String, dynamic>;
-        setGlobalState(
-          curp,
-          data['nombres'],
-          data['apellido_paterno'],
-          data['apellido_materno'],
-        );
+        setGlobalState(curp, data['nombres'], data['apellido_paterno'],
+            data['apellido_materno'], data['folio_mivacuna']);
         return true;
       }
       return false;

@@ -1,10 +1,13 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covid_app/models/register_model.dart';
 import 'package:covid_app/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class CompleteProfilePage extends StatefulWidget {
@@ -15,10 +18,14 @@ class CompleteProfilePage extends StatefulWidget {
 }
 
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
+  CollectionReference userProfiles =
+      FirebaseFirestore.instance.collection('user_profiles');
   final ImagePicker _picker = ImagePicker();
-  String avatarBaseUrl = 'https://joeschmoe.io/api/v1/';
+  final String avatarBaseUrl = 'https://joeschmoe.io/api/v1/';
+  Widget? selectedProfileImage;
   List<Widget> avatarList = [];
   String imgType = 'icon';
+  String? imgUrl;
 
   Widget defaultProfileImage(double size) {
     return Icon(
@@ -44,7 +51,38 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
-  Widget? selectedProfileImage;
+  Future<void> saveUserProfile() {
+    String curp = Provider.of<RegisterModel>(context, listen: false).curp;
+    return userProfiles.doc(curp).set({
+      'completed': true,
+      'nombres': Provider.of<RegisterModel>(context, listen: false).nombres,
+      'apellidos': Provider.of<RegisterModel>(context, listen: false).apellidos,
+      'sexo': getGenderFromCurp(curp),
+      'fecha_nacimiento': getBirthDateFromCurp(curp),
+      'imgType': imgType,
+      'imgUrl': imgUrl,
+      'folio': Provider.of<RegisterModel>(context, listen: false).folioMiVacuna,
+    });
+  }
+
+  String getGenderFromCurp(String curp) {
+    String gender = curp.substring(10, 11);
+    return gender == 'H' ? 'Masculino' : 'Femenino';
+  }
+
+  String getBirthDateFromCurp(String curp) {
+    String year = curp.substring(4, 6);
+    String month = curp.substring(6, 8);
+    String day = curp.substring(8, 10);
+    Intl.defaultLocale = 'es';
+    DateTime birthDate = DateFormat('yy MM dd').parse('$year $month $day');
+    return formatBirthDate(birthDate);
+  }
+
+  String formatBirthDate(DateTime birthDate) {
+    DateFormat formatter = DateFormat('dd-MMMM-yyyy');
+    return formatter.format(birthDate).replaceAll('-', ' de ');
+  }
 
   @override
   void initState() {
@@ -83,17 +121,20 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             style: TextButton.styleFrom(
               textStyle: const TextStyle(fontSize: 16.0),
             ),
-            onPressed: () {
+            onPressed: () async {
               if (imgType == 'icon') {
                 context.read<RegisterModel>().imageProfile = null;
               } else {
                 context.read<RegisterModel>().imageProfile =
                     selectedProfileImage;
               }
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+              await saveUserProfile()
+                  .then((value) => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                      ))
+                  .catchError((error) => log(error));
             },
             child: const Text('Listo'),
           )
@@ -169,6 +210,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                         setState(() {
                           selectedProfileImage = avatarList[index];
                           imgType = index == 0 ? 'icon' : 'svg';
+                          if (index != 0) {
+                            imgUrl = avatarBaseUrl + index.toString();
+                          }
                         });
                       },
                       child: OverflowBox(child: avatarList[index]),
