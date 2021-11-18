@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -18,13 +19,41 @@ class _SettingsPageState extends State<SettingsPage> {
       FirebaseFirestore.instance.collection('user_profiles');
   bool value = true;
   UserProfile? profile;
+  Widget? imageProfile;
 
   Future<void> getUserData() async {
     String curp = Provider.of<RegisterModel>(context, listen: false).curp;
     DocumentSnapshot snapshot = await profiles.doc(curp).get();
-    setState(() {
-      profile = UserProfile.fromJson(snapshot.data() as Map<String, dynamic>);
-    });
+    profile = UserProfile.fromJson(snapshot.data() as Map<String, dynamic>);
+    imageProfile = await parseProfileImage(profile!.imgType!, profile!.imgUrl);
+    setState(() {});
+  }
+
+  Future<String> downloadURL() async {
+    String curp = Provider.of<RegisterModel>(context, listen: false).curp;
+    String downloadURL = await firebase_storage.FirebaseStorage.instance
+        .ref('images/$curp')
+        .getDownloadURL();
+    return downloadURL;
+  }
+
+  Future<Widget> parseProfileImage(String imgType, String? imgUrl) async {
+    if (imgType == 'svg') {
+      return SvgPicture.network(imgUrl!);
+    } else if (imgType == 'file') {
+      String url = await downloadURL();
+      return Image.network(
+        url,
+        width: 80.0,
+        height: 80.0,
+      );
+    } else {
+      return Icon(
+        Icons.person_outlined,
+        color: Colors.grey[700],
+        size: 80.0,
+      );
+    }
   }
 
   void loadData() async {
@@ -66,21 +95,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
                     children: [
                       Container(
-                          padding: const EdgeInsets.all(15.0),
-                          margin: const EdgeInsets.only(bottom: 20.0),
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(20.0),
-                            ),
-                            color: Colors.grey[200],
+                        padding: const EdgeInsets.all(15.0),
+                        margin: const EdgeInsets.only(bottom: 20.0),
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20.0),
                           ),
-                          child: SvgPicture.network(profile!.imgUrl!)
-                          // Icon(
-                          //   Icons.person_outlined,
-                          //   color: Colors.grey[700],
-                          //   size: 60.0,
-                          // ),
-                          ),
+                          color: Colors.grey[200],
+                        ),
+                        child: imageProfile,
+                      ),
                       Column(
                         children: [
                           Text(

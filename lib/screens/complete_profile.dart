@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class CompleteProfilePage extends StatefulWidget {
   const CompleteProfilePage({Key? key}) : super(key: key);
@@ -18,16 +19,18 @@ class CompleteProfilePage extends StatefulWidget {
 }
 
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
   CollectionReference userProfiles =
       FirebaseFirestore.instance.collection('user_profiles');
   final ImagePicker _picker = ImagePicker();
   final String avatarBaseUrl = 'https://joeschmoe.io/api/v1/';
   Widget? selectedProfileImage;
   List<Widget> avatarList = [];
-  String imgType = 'icon';
+  String imgType = 'default';
   String? imgUrl;
 
-  Widget defaultProfileImage(double size) {
+  Icon defaultProfileImage(double size) {
     return Icon(
       Icons.person_outlined,
       color: Colors.grey[700],
@@ -35,7 +38,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
-  Widget avatarProfileImage(String url) {
+  SvgPicture avatarProfileImage(String url) {
     return SvgPicture.network(
       url,
       width: 60.0,
@@ -43,12 +46,24 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
-  Widget fileProfileImage(String path) {
+  Image fileProfileImage(String path) {
     return Image.file(
       File(path),
       width: 60.0,
       height: 60.0,
     );
+  }
+
+  Future<void> uploadFile(String filePath) async {
+    File file = File(filePath);
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref(
+              'images/${Provider.of<RegisterModel>(context, listen: false).curp}')
+          .putFile(file);
+    } on FirebaseException catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<void> saveUserProfile() {
@@ -105,12 +120,16 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16.0),
           ),
-          onPressed: () {
+          onPressed: () async {
+            imgType = 'default';
+            imgUrl = null;
             context.read<RegisterModel>().imageProfile = null;
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
+            await saveUserProfile()
+                .then((value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    ))
+                .catchError((error) => log(error));
           },
           child: const Text('Omitir'),
         ),
@@ -121,11 +140,15 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               textStyle: const TextStyle(fontSize: 16.0),
             ),
             onPressed: () async {
-              if (imgType == 'icon') {
+              if (imgType == 'default') {
                 context.read<RegisterModel>().imageProfile = null;
               } else {
                 context.read<RegisterModel>().imageProfile =
                     selectedProfileImage;
+                if (imgType == 'file') {
+                  await uploadFile(imgUrl!);
+                  imgUrl = null;
+                }
               }
               await saveUserProfile()
                   .then((value) => Navigator.push(
@@ -208,8 +231,10 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       onPressed: () {
                         setState(() {
                           selectedProfileImage = avatarList[index];
-                          imgType = index == 0 ? 'icon' : 'svg';
-                          if (index != 0) {
+                          imgType = index == 0 ? 'default' : 'svg';
+                          if (index == 0) {
+                            imgUrl = null;
+                          } else {
                             imgUrl = avatarBaseUrl + index.toString();
                           }
                         });
@@ -226,6 +251,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                     await _picker.pickImage(source: ImageSource.camera);
                 setState(() {
                   selectedProfileImage = fileProfileImage(photo!.path);
+                  imgType = 'file';
+                  imgUrl = photo.path;
                 });
               },
               child: Row(
@@ -247,8 +274,11 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               onPressed: () async {
                 final XFile? image =
                     await _picker.pickImage(source: ImageSource.gallery);
+
                 setState(() {
                   selectedProfileImage = fileProfileImage(image!.path);
+                  imgType = 'file';
+                  imgUrl = image.path;
                 });
               },
               child: Row(
