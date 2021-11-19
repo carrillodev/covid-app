@@ -6,6 +6,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -44,8 +45,8 @@ class _SettingsPageState extends State<SettingsPage> {
       String url = await downloadURL();
       return Image.network(
         url,
-        width: 80.0,
-        height: 80.0,
+        width: 100.0,
+        height: 100.0,
       );
     } else {
       return Icon(
@@ -193,28 +194,48 @@ class _SettingsPageState extends State<SettingsPage> {
                     leading: const Icon(
                       Icons.mail,
                     ),
-                    onPressed: (BuildContext context) {},
+                    onPressed: (BuildContext context) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const ChangeEmailDialog(),
+                      );
+                    },
                   ),
                   SettingsTile(
                     title: 'Reportar un problema',
                     leading: const Icon(
                       Icons.report,
                     ),
-                    onPressed: (BuildContext context) {},
+                    onPressed: (BuildContext context) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const ReportDialog(),
+                      );
+                    },
                   ),
                   SettingsTile(
                     title: 'Ayuda',
                     leading: const Icon(
                       Icons.help_outlined,
                     ),
-                    onPressed: (BuildContext context) {},
+                    onPressed: (BuildContext context) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const HelpDialog(),
+                      );
+                    },
                   ),
                   SettingsTile(
-                    title: 'Condiciones y políticas',
+                    title: 'Condiciones y políticas de privacidad',
                     leading: const Icon(
                       Icons.gavel_outlined,
                     ),
-                    onPressed: (BuildContext context) {},
+                    onPressed: (BuildContext context) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const TermsAndConditionsDialog(),
+                      );
+                    },
                   ),
                 ],
               )
@@ -259,6 +280,247 @@ class UserInfoColumn extends StatelessWidget {
               ),
         ),
         SizedBox(height: marginBottom),
+      ],
+    );
+  }
+}
+
+class TermsAndConditionsDialog extends StatelessWidget {
+  const TermsAndConditionsDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Condiciones de uso y políticas de privacidad'),
+      scrollable: true,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Información relevante',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.grey[800], fontSize: 16.0)),
+          const SizedBox(height: 10.0),
+          Text(
+            'La presente Política de Privacidad establece los términos en que COV-ID APP usa y protege la información que es proporcionada por sus usuarios al momento de utilizar su aplicación. Esta compañía está comprometida con la seguridad de los datos de sus usuarios. Cuando le pedimos llenar los campos de información personal con la cual usted pueda ser identificado, lo hacemos asegurando que sólo se empleará de acuerdo con los términos de este documento.',
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  color: Colors.grey[600],
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w400,
+                ),
+          ),
+          const SizedBox(height: 10.0),
+          Text('Información que es recogida',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.grey[800], fontSize: 16.0)),
+          const SizedBox(
+            height: 10.0,
+          ),
+          Text(
+            'Nuestra aplicación podrá recoger información personal por ejemplo: Nombre,  información de contacto como  su dirección de correo electrónica e información demográfica. Así mismo cuando sea necesario podrá ser requerida información específica para procesar algún pedido o realizar una entrega o facturación.',
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  color: Colors.grey[600],
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w400,
+                ),
+          ),
+          const SizedBox(height: 10.0),
+          Text('Enlaces a terceros',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.grey[800], fontSize: 16.0)),
+          const SizedBox(
+            height: 10.0,
+          ),
+          Text(
+            'Esta aplicación pudiera contener enlaces a otros sitios que pudieran ser de su interés. Una vez que usted de clic en estos enlaces y abandone nuestra página, ya no tenemos control sobre al sitio al que es redirigido y por lo tanto no somos responsables de los términos o privacidad ni de la protección de sus datos en esos otros sitios terceros. Dichos sitios están sujetos a sus propias políticas de privacidad por lo cual es recomendable que los consulte para confirmar que usted está de acuerdo con estas..',
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  color: Colors.grey[600],
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w400,
+                ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cerrar'),
+        ),
+      ],
+    );
+  }
+}
+
+class HelpDialog extends StatelessWidget {
+  const HelpDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Ayuda'),
+      contentPadding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('COV-ID App',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.grey[800], fontSize: 16.0)),
+          const SizedBox(height: 10.0),
+          Text(
+            'COV-ID App busca ayudar a que las personas puedan comprobar su actual estado de vacunación, obteniendo esta información desde sus celulares. Teniendo este recurso con un acceso fácil se pretende que en restaurantes, trabajos, cualquier establecimiento o incluso puntos fronterizos que soliciten este requerimiento, se pueda comprobar de manera veraz que se cumple con la vacunación, ya sea parcial o completamente.',
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  color: Colors.grey[600],
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w400,
+                ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cerrar'),
+        ),
+      ],
+    );
+  }
+}
+
+class ChangeEmailDialog extends StatefulWidget {
+  const ChangeEmailDialog({Key? key}) : super(key: key);
+
+  @override
+  _ChangeEmailDialogState createState() => _ChangeEmailDialogState();
+}
+
+class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
+  final _formKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Cambiar dirección de correo'),
+      scrollable: true,
+      content: FormBuilder(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FormBuilderTextField(
+              name: 'currentEmail',
+              initialValue: 'felipe.carrillo1@hotmail.com',
+              readOnly: true,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Correo actual',
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(context),
+                FormBuilderValidators.email(context),
+              ]),
+            ),
+            const SizedBox(height: 20.0),
+            FormBuilderTextField(
+              name: 'newEmail',
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Nuevo correo',
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(context),
+                FormBuilderValidators.email(context),
+              ]),
+            ),
+            const SizedBox(height: 20.0),
+            FormBuilderTextField(
+              name: 'newEmailConfirm',
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Confirma el nuevo correo',
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(context),
+                FormBuilderValidators.email(context),
+              ]),
+            )
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {},
+          child: const Text('Cambiar'),
+        ),
+      ],
+    );
+  }
+}
+
+class ReportDialog extends StatefulWidget {
+  const ReportDialog({Key? key}) : super(key: key);
+
+  @override
+  _ReportDialogState createState() => _ReportDialogState();
+}
+
+class _ReportDialogState extends State<ReportDialog> {
+  final _formKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Reportar un problema'),
+      scrollable: true,
+      content: FormBuilder(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FormBuilderTextField(
+              name: '¿Cuál es tu problema?',
+              autofocus: true,
+              minLines: 3,
+              maxLines: 5,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Escribe aquí tu problema',
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(context),
+              ]),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {},
+          child: const Text('Reportar'),
+        ),
       ],
     );
   }
