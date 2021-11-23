@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -162,14 +163,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       });
                     },
                   ),
-                  SettingsTile(
-                    title: 'Modo oscuro',
-                    subtitle: 'Sistema',
-                    leading: const Icon(
-                      Icons.brightness_4,
-                    ),
-                    onPressed: (BuildContext context) {},
-                  ),
+                  // SettingsTile(
+                  //   title: 'Modo oscuro',
+                  //   subtitle: 'Sistema',
+                  //   leading: const Icon(
+                  //     Icons.brightness_4,
+                  //   ),
+                  //   onPressed: (BuildContext context) {},
+                  // ),
                   SettingsTile(
                     title: 'Privacidad',
                     leading: const Icon(
@@ -187,7 +188,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     leading: const Icon(
                       Icons.no_cell,
                     ),
-                    onPressed: (BuildContext context) {},
+                    onPressed: (BuildContext context) async {
+                      await FirebaseAuth.instance.signOut();
+                    },
                   ),
                   SettingsTile(
                     title: 'Cambiar dirección de correo',
@@ -408,6 +411,9 @@ class ChangeEmailDialog extends StatefulWidget {
 class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
   final _formKey = GlobalKey<FormBuilderState>();
 
+  CollectionReference userProfiles =
+      FirebaseFirestore.instance.collection('user_profiles');
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -420,7 +426,8 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
           children: [
             FormBuilderTextField(
               name: 'currentEmail',
-              initialValue: 'felipe.carrillo1@hotmail.com',
+              initialValue:
+                  Provider.of<RegisterModel>(context, listen: false).email,
               readOnly: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -434,6 +441,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
             const SizedBox(height: 20.0),
             FormBuilderTextField(
               name: 'newEmail',
+              initialValue: '',
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Nuevo correo',
@@ -466,7 +474,17 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              String email = _formKey.currentState!.fields['newEmail']!.value;
+              userProfiles
+                  .doc(Provider.of<RegisterModel>(context, listen: false).curp)
+                  .update({'email': email}).then((value) {
+                Navigator.pop(context);
+                _formKey.currentState!.reset();
+              });
+            }
+          },
           child: const Text('Cambiar'),
         ),
       ],
@@ -483,6 +501,8 @@ class ReportDialog extends StatefulWidget {
 
 class _ReportDialogState extends State<ReportDialog> {
   final _formKey = GlobalKey<FormBuilderState>();
+  CollectionReference problems =
+      FirebaseFirestore.instance.collection('problems');
 
   @override
   Widget build(BuildContext context) {
@@ -495,7 +515,7 @@ class _ReportDialogState extends State<ReportDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             FormBuilderTextField(
-              name: '¿Cuál es tu problema?',
+              name: 'problem',
               autofocus: true,
               minLines: 3,
               maxLines: 5,
@@ -518,7 +538,30 @@ class _ReportDialogState extends State<ReportDialog> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              String description =
+                  _formKey.currentState!.fields['problem']!.value;
+              problems.add({
+                'author': {
+                  'curp':
+                      Provider.of<RegisterModel>(context, listen: false).curp,
+                  'nombres': Provider.of<RegisterModel>(context, listen: false)
+                      .nombres,
+                  'apellidos':
+                      Provider.of<RegisterModel>(context, listen: false)
+                          .apellidos,
+                  'email':
+                      Provider.of<RegisterModel>(context, listen: false).email,
+                },
+                'date': DateTime.now(),
+                'description': description,
+              }).then((value) {
+                Navigator.pop(context);
+                _formKey.currentState!.reset();
+              });
+            }
+          },
           child: const Text('Reportar'),
         ),
       ],

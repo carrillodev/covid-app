@@ -73,6 +73,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       'nombres': Provider.of<RegisterModel>(context, listen: false).nombres,
       'apellidos': Provider.of<RegisterModel>(context, listen: false).apellidos,
       'sexo': getGenderFromCurp(curp),
+      'email': Provider.of<RegisterModel>(context, listen: false).email,
       'fecha_nacimiento': getBirthDateFromCurp(curp),
       'profile_image': {'type': imgType, 'url': imgUrl},
       'folio': Provider.of<RegisterModel>(context, listen: false).folioMiVacuna,

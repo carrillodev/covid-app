@@ -30,25 +30,27 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void setGlobalState(String curp, String nombres, String apellidoPaterno,
-      String apellidoMaterno, String folioMiVacuna) {
+      String apellidoMaterno, String folioMiVacuna, String email) {
     var registerModel = context.read<RegisterModel>();
     registerModel.curp = curp;
     registerModel.nombres = nombres;
     registerModel.apellidoPaterno = apellidoPaterno;
     registerModel.apellidoMaterno = apellidoMaterno;
     registerModel.folioMiVacuna = folioMiVacuna;
+    registerModel.email = email;
   }
 
   Future<bool> checkExistence() async {
     CollectionReference users =
         FirebaseFirestore.instance.collection('vaccine_registers');
     String curp = _formKey.currentState!.fields['CURP']!.value;
+    String email = _formKey.currentState!.fields['email']!.value;
     try {
       DocumentSnapshot user = await users.doc(curp).get();
       if (user.data() != null) {
         Map<String, dynamic> data = user.data() as Map<String, dynamic>;
         setGlobalState(curp, data['nombres'], data['apellido_paterno'],
-            data['apellido_materno'], data['folio_mivacuna']);
+            data['apellido_materno'], data['folio_mivacuna'], email);
         return true;
       }
       return false;

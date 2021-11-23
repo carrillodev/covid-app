@@ -6,6 +6,7 @@ class RegisterModel extends ChangeNotifier {
   late String apellidoPaterno;
   late String apellidoMaterno;
   late String folioMiVacuna;
+  late String email;
   late dynamic imageProfile;
 
   String get nombreCompleto => '$nombres $apellidoPaterno $apellidoMaterno';
